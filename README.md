@@ -1,8 +1,13 @@
-minidom
-=======
+domino
+======
 
 What's this?
 ------------
 
-A minimal DOM library on top of quick-xml. targeting exclusively the subset of
-XML useful for XMPP.
+This is a fork of minidom (https://crates.io/crates/minidom) that isn't targetted at XMPP only.
+
+Differences
+-----------
+
+Right now the main difference is the fact that domino doesn't require elements
+to be in a namespace.

@@ -20,9 +20,9 @@
 //! Run with `cargo run --example articles`. Located in `examples/articles.rs`.
 //!
 //! ```rust,ignore
-//! extern crate minidom;
+//! extern crate domino;
 //!
-//! use minidom::Element;
+//! use domino::Element;
 //!
 //! const DATA: &'static str = r#"<articles xmlns="article">
 //!     <article>
@@ -69,10 +69,10 @@
 //!
 //! # Usage
 //!
-//! To use `minidom`, add this to your `Cargo.toml` under `dependencies`:
+//! To use `domino`, add this to your `Cargo.toml` under `dependencies`:
 //!
 //! ```toml,ignore
-//! minidom = "*"
+//! domino = "0.0.1"
 //! ```
 
 pub use quick_xml;

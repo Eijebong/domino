@@ -1,21 +1,13 @@
 [package]
 name = "domino"
-version = "0.14.0"
-authors = [
-  "lumi <lumi@pew.im>",
-  "Emmanuel Gil Peyrot <linkmauve@linkmauve.fr>",
-  "Bastien Orivel <eijebong+minidom@bananium.fr>",
-  "Astro <astro@spaceboyz.net>",
-  "Maxime “pep” Buquet <pep@bouah.net>",
-]
-description = "A small, simple DOM implementation on top of quick-xml, targeting the subset of XML useful for XMPP"
-homepage = "https://gitlab.com/xmpp-rs/xmpp-rs"
-repository = "https://gitlab.com/xmpp-rs/xmpp-rs"
-documentation = "https://docs.rs/minidom"
-readme = "README.md"
-keywords = ["xml", "xmpp"]
+version = "0.0.1"
+authors = ["Bastien Orivel <eijebong@bananium.fr>"]
+description = "A small, simple DOM implementation on top of quick-xml. Fork of minidom not targetted at XMPP only"
+repository = "https://github.com/Eijebong/domino"
+documentation = "https://docs.rs/domino"
+keywords = ["xml"]
 license = "MPL-2.0"
-edition = "2018"
+edition = "2021"
 
 [dependencies]
 quick-xml = "0.22.0"

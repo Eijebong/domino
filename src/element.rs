@@ -148,7 +148,7 @@ impl Element {
     /// # Examples
     ///
     /// ```rust
-    /// use minidom::Element;
+    /// use domino::Element;
     ///
     /// let elem = Element::builder("name", "namespace")
     ///                    .attr("name", "value")
@@ -178,7 +178,7 @@ impl Element {
     /// # Examples
     ///
     /// ```rust
-    /// use minidom::Element;
+    /// use domino::Element;
     ///
     /// let bare = Element::bare("name", "namespace");
     ///
@@ -220,7 +220,7 @@ impl Element {
     /// # Example
     ///
     /// ```rust
-    /// use minidom::Element;
+    /// use domino::Element;
     ///
     /// let elm: Element = "<elem xmlns=\"ns1\" a=\"b\" />".parse().unwrap();
     ///
@@ -264,7 +264,7 @@ impl Element {
     /// # Examples
     ///
     /// ```rust
-    /// use minidom::{Element, NSChoice};
+    /// use domino::{Element, NSChoice};
     ///
     /// let elem = Element::builder("name", "namespace").build();
     ///
@@ -287,7 +287,7 @@ impl Element {
     /// # Examples
     ///
     /// ```rust
-    /// use minidom::{Element, NSChoice};
+    /// use domino::{Element, NSChoice};
     ///
     /// let elem = Element::builder("name", "namespace").build();
     ///
@@ -548,7 +548,7 @@ impl Element {
     /// # Examples
     ///
     /// ```rust
-    /// use minidom::Element;
+    /// use domino::Element;
     ///
     /// let elem: Element = "<root xmlns=\"ns1\">a<c1 />b<c2 />c</root>".parse().unwrap();
     ///
@@ -577,7 +577,7 @@ impl Element {
     /// # Examples
     ///
     /// ```rust
-    /// use minidom::Element;
+    /// use domino::Element;
     ///
     /// let elem: Element = "<root xmlns=\"ns1\">hello<child1 xmlns=\"ns1\"/>this<child2 xmlns=\"ns1\"/>is<child3 xmlns=\"ns1\"/>ignored</root>".parse().unwrap();
     ///
@@ -607,7 +607,7 @@ impl Element {
     /// # Examples
     ///
     /// ```rust
-    /// use minidom::Element;
+    /// use domino::Element;
     ///
     /// let elem: Element = "<root xmlns=\"ns1\">hello<c /> world!</root>".parse().unwrap();
     ///
@@ -636,7 +636,7 @@ impl Element {
     /// # Examples
     ///
     /// ```rust
-    /// use minidom::Element;
+    /// use domino::Element;
     ///
     /// let mut elem = Element::bare("root", "ns1");
     ///
@@ -668,7 +668,7 @@ impl Element {
     /// # Examples
     ///
     /// ```rust
-    /// use minidom::Element;
+    /// use domino::Element;
     ///
     /// let mut elem = Element::bare("node", "ns1");
     ///
@@ -687,7 +687,7 @@ impl Element {
     /// # Examples
     ///
     /// ```rust
-    /// use minidom::{Element, Node};
+    /// use domino::{Element, Node};
     ///
     /// let mut elem = Element::bare("node", "ns1");
     ///
@@ -704,7 +704,7 @@ impl Element {
     /// # Examples
     ///
     /// ```rust
-    /// use minidom::Element;
+    /// use domino::Element;
     ///
     /// let elem: Element = "<node xmlns=\"ns1\">hello,<split /> world!</node>".parse().unwrap();
     ///
@@ -720,7 +720,7 @@ impl Element {
     /// # Examples
     ///
     /// ```rust
-    /// use minidom::{Element, NSChoice};
+    /// use domino::{Element, NSChoice};
     ///
     /// let elem: Element = r#"<node xmlns="ns"><a/><a xmlns="other_ns" /><b/></node>"#.parse().unwrap();
     /// assert!(elem.get_child("a", "ns").unwrap().is("a", "ns"));
@@ -770,7 +770,7 @@ impl Element {
     /// # Examples
     ///
     /// ```rust
-    /// use minidom::{Element, NSChoice};
+    /// use domino::{Element, NSChoice};
     ///
     /// let elem: Element = r#"<node xmlns="ns"><a /><a xmlns="other_ns" /><b /></node>"#.parse().unwrap();
     /// assert_eq!(elem.has_child("a", "other_ns"), true);
@@ -795,7 +795,7 @@ impl Element {
     /// # Examples
     ///
     /// ```rust
-    /// use minidom::{Element, NSChoice};
+    /// use domino::{Element, NSChoice};
     ///
     /// let mut elem: Element = r#"<node xmlns="ns"><a /><a xmlns="other_ns" /><b /></node>"#.parse().unwrap();
     /// assert!(elem.remove_child("a", "ns").unwrap().is("a", "ns"));

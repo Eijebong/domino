@@ -33,7 +33,7 @@ impl Node {
     /// # Examples
     ///
     /// ```rust
-    /// use minidom::Node;
+    /// use domino::Node;
     ///
     /// let elm = Node::Element("<meow xmlns=\"ns1\"/>".parse().unwrap());
     /// let txt = Node::Text("meow".to_owned());
@@ -54,7 +54,7 @@ impl Node {
     /// # Examples
     ///
     /// ```rust
-    /// use minidom::Node;
+    /// use domino::Node;
     ///
     /// let mut elm = Node::Element("<meow xmlns=\"ns1\"/>".parse().unwrap());
     /// let mut txt = Node::Text("meow".to_owned());
@@ -75,7 +75,7 @@ impl Node {
     /// # Examples
     ///
     /// ```rust
-    /// use minidom::Node;
+    /// use domino::Node;
     ///
     /// let elm = Node::Element("<meow xmlns=\"ns1\"/>".parse().unwrap());
     /// let txt = Node::Text("meow".to_owned());
@@ -96,7 +96,7 @@ impl Node {
     /// # Examples
     ///
     /// ```rust
-    /// use minidom::Node;
+    /// use domino::Node;
     ///
     /// let elm = Node::Element("<meow xmlns=\"ns1\"/>".parse().unwrap());
     /// let txt = Node::Text("meow".to_owned());
@@ -117,7 +117,7 @@ impl Node {
     /// # Examples
     ///
     /// ```rust
-    /// use minidom::Node;
+    /// use domino::Node;
     ///
     /// let mut elm = Node::Element("<meow xmlns=\"ns1\"/>".parse().unwrap());
     /// let mut txt = Node::Text("meow".to_owned());
@@ -144,7 +144,7 @@ impl Node {
     /// # Examples
     ///
     /// ```rust
-    /// use minidom::Node;
+    /// use domino::Node;
     ///
     /// let elm = Node::Element("<meow xmlns=\"ns1\"/>".parse().unwrap());
     /// let txt = Node::Text("meow".to_owned());
