@@ -1,0 +1,11 @@
+[package]
+name = "domino"
+version = "0.0.1"
+edition = "2021"
+kekywords = ["xml"]
+description = "A simple DOM implementation based on quick-xml. Fork of minidom targetted at more generic XML."
+license = "MPL-2.0"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
