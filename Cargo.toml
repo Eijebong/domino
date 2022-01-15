@@ -1,11 +1,21 @@
 [package]
 name = "domino"
-version = "0.0.1"
-edition = "2021"
-kekywords = ["xml"]
-description = "A simple DOM implementation based on quick-xml. Fork of minidom targetted at more generic XML."
+version = "0.14.0"
+authors = [
+  "lumi <lumi@pew.im>",
+  "Emmanuel Gil Peyrot <linkmauve@linkmauve.fr>",
+  "Bastien Orivel <eijebong+minidom@bananium.fr>",
+  "Astro <astro@spaceboyz.net>",
+  "Maxime “pep” Buquet <pep@bouah.net>",
+]
+description = "A small, simple DOM implementation on top of quick-xml, targeting the subset of XML useful for XMPP"
+homepage = "https://gitlab.com/xmpp-rs/xmpp-rs"
+repository = "https://gitlab.com/xmpp-rs/xmpp-rs"
+documentation = "https://docs.rs/minidom"
+readme = "README.md"
+keywords = ["xml", "xmpp"]
 license = "MPL-2.0"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+edition = "2018"
 
 [dependencies]
+quick-xml = "0.22.0"
