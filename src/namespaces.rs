@@ -26,13 +26,24 @@ impl<'a> From<&'a str> for NSChoice<'a> {
     }
 }
 
+impl<'a> From<Option<&'a str>> for NSChoice<'a> {
+    fn from(ns: Option<&'a str>) -> Self {
+        match ns {
+            None => NSChoice::Any,
+            Some(ns) => ns.into()
+        }
+    }
+}
+
 impl<'a> NSChoice<'a> {
-    pub(crate) fn compare(&self, ns: &str) -> bool {
+    pub(crate) fn compare(&self, ns: &Option<String>) -> bool {
         match (ns, &self) {
-            (_, NSChoice::None) => false,
+            (Some(_), NSChoice::None) => false,
+            (None, NSChoice::None) => false,
             (_, NSChoice::Any) => true,
-            (ns, NSChoice::OneOf(wanted_ns)) => &ns == wanted_ns,
-            (ns, NSChoice::AnyOf(wanted_nss)) => wanted_nss.iter().any(|w| &ns == w),
+            (Some(ns), NSChoice::OneOf(wanted_ns)) => &ns == wanted_ns,
+            (Some(ns), NSChoice::AnyOf(wanted_nss)) => wanted_nss.iter().any(|w| &ns == w),
+            (None, _) => false
         }
     }
 }

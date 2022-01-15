@@ -81,10 +81,7 @@ pub fn escape(raw: &[u8]) -> Cow<[u8]> {
 /// A struct representing a DOM Element.
 pub struct Element {
     name: String,
-    namespace: String,
-    /// This is only used when deserializing. If you have to use a custom prefix use
-    /// `ElementBuilder::prefix`.
-    prefix: Option<Prefix>,
+    namespace: Option<String>,
     prefixes: Prefixes,
     attributes: BTreeMap<String, String>,
     children: Vec<Node>,
@@ -130,8 +127,7 @@ fn ensure_no_prefix<S: AsRef<str>>(s: &S) -> Result<()> {
 impl Element {
     fn new<P: Into<Prefixes>>(
         name: String,
-        namespace: String,
-        prefix: Option<Prefix>,
+        namespace: Option<String>,
         prefixes: P,
         attributes: BTreeMap<String, String>,
         children: Vec<Node>,
@@ -141,7 +137,6 @@ impl Element {
         Element {
             name,
             namespace,
-            prefix,
             prefixes: prefixes.into(),
             attributes,
             children,
@@ -161,7 +156,7 @@ impl Element {
     ///                    .build();
     ///
     /// assert_eq!(elem.name(), "name");
-    /// assert_eq!(elem.ns(), "namespace".to_owned());
+    /// assert_eq!(elem.ns(), Some("namespace".to_owned()));
     /// assert_eq!(elem.attr("name"), Some("value"));
     /// assert_eq!(elem.attr("inexistent"), None);
     /// assert_eq!(elem.text(), "inner");
@@ -170,8 +165,7 @@ impl Element {
         ElementBuilder {
             root: Element::new(
                 name.as_ref().to_string(),
-                namespace.into(),
-                None,
+                Some(namespace.into()),
                 None,
                 BTreeMap::new(),
                 Vec::new(),
@@ -189,15 +183,14 @@ impl Element {
     /// let bare = Element::bare("name", "namespace");
     ///
     /// assert_eq!(bare.name(), "name");
-    /// assert_eq!(bare.ns(), "namespace");
+    /// assert_eq!(bare.ns(), Some("namespace".to_owned()));
     /// assert_eq!(bare.attr("name"), None);
     /// assert_eq!(bare.text(), "");
     /// ```
     pub fn bare<S: Into<String>, NS: Into<String>>(name: S, namespace: NS) -> Element {
         Element::new(
             name.into(),
-            namespace.into(),
-            None,
+            Some(namespace.into()),
             None,
             BTreeMap::new(),
             Vec::new(),
@@ -210,7 +203,7 @@ impl Element {
     }
 
     /// Returns a reference to the namespace of this element.
-    pub fn ns(&self) -> String {
+    pub fn ns(&self) -> Option<String> {
         self.namespace.clone()
     }
 
@@ -286,7 +279,7 @@ impl Element {
     /// assert_eq!(elem.is("name", NSChoice::Any), true);
     /// ```
     pub fn is<'a, N: AsRef<str>, NS: Into<NSChoice<'a>>>(&self, name: N, namespace: NS) -> bool {
-        self.name == name.as_ref() && namespace.into().compare(self.namespace.as_ref())
+        self.name == name.as_ref() && namespace.into().compare(&self.namespace)
     }
 
     /// Returns whether the element has the given namespace.
@@ -307,7 +300,7 @@ impl Element {
     /// assert_eq!(elem.has_ns(NSChoice::Any), true);
     /// ```
     pub fn has_ns<'a, NS: Into<NSChoice<'a>>>(&self, namespace: NS) -> bool {
-        namespace.into().compare(self.namespace.as_ref())
+        namespace.into().compare(&self.namespace)
     }
 
     /// Parse a document from an `EventReader`.
@@ -367,14 +360,14 @@ impl Element {
                         let opening_prefix = {
                             let mut tmp: Option<Option<String>> = None;
                             for (prefix, ns) in prefixes {
-                                if ns == elem.namespace {
+                                if Some(ns) == elem.namespace {
                                     tmp = Some(prefix.clone());
                                     break;
                                 }
                             }
                             match tmp {
                                 Some(prefix) => prefix,
-                                None => return Err(Error::InvalidPrefix),
+                                None => None,
                             }
                         };
                         match split_iter.next() {
@@ -462,13 +455,14 @@ impl Element {
         // If the element prefix hasn't been set yet via a custom prefix, add it.
         let mut existing_self_prefix: Option<Option<String>> = None;
         for (prefix, ns) in local_prefixes.iter().chain(all_prefixes.iter()) {
-            if ns == &self.namespace {
+            if Some(ns) == self.namespace.as_ref() {
                 existing_self_prefix = Some(prefix.clone());
             }
         }
 
         let mut all_keys = all_prefixes.keys().cloned();
         let mut local_keys = local_prefixes.keys().cloned();
+
         let self_prefix: (Option<String>, bool) = match existing_self_prefix {
             // No prefix exists already for our namespace
             None => {
@@ -497,20 +491,22 @@ impl Element {
         };
         let mut start = BytesStart::borrowed(name.as_bytes(), name.len());
 
-        // Write self prefix if necessary
-        match self_prefix {
-            (Some(ref p), true) => {
-                let key = format!("xmlns:{}", p);
-                start.push_attribute((key.as_bytes(), self.namespace.as_bytes()));
-                all_prefixes.insert(self_prefix.0, self.namespace.clone());
-            }
-            (None, true) => {
-                let key = String::from("xmlns");
-                start.push_attribute((key.as_bytes(), self.namespace.as_bytes()));
-                all_prefixes.insert(self_prefix.0, self.namespace.clone());
-            }
-            _ => (),
-        };
+        if self.namespace.is_some() {
+            // Write self prefix if necessary
+            match self_prefix {
+                (Some(ref p), true) => {
+                    let key = format!("xmlns:{}", p);
+                    start.push_attribute((key.as_bytes(), self.namespace.as_ref().unwrap().as_bytes()));
+                    all_prefixes.insert(self_prefix.0, self.namespace.as_ref().unwrap().clone());
+                }
+                (None, true) => {
+                    let key = String::from("xmlns");
+                    start.push_attribute((key.as_bytes(), self.namespace.as_ref().unwrap().as_bytes()));
+                    all_prefixes.insert(self_prefix.0, self.namespace.as_ref().unwrap().clone());
+                }
+                _ => (),
+            };
+        }
 
         // Custom prefixes/namespace sets
         for (prefix, ns) in local_prefixes {
@@ -864,22 +860,11 @@ fn build_element<R: BufRead>(
         })
         .collect::<Result<BTreeMap<String, String>>>()?;
 
-    let namespace: &String = {
-        if let Some(namespace) = local_prefixes.get(&prefix) {
-            namespace
-        } else if let Some(namespace) = prefixes.get(&prefix) {
-            namespace
-        } else {
-            return Err(Error::MissingNamespace);
-        }
-    };
+    let namespace = local_prefixes.get(&prefix).or(prefixes.get(&prefix));
 
     Ok(Element::new(
         name,
-        namespace.clone(),
-        // Note that this will always be Some(_) as we can't distinguish between the None case and
-        // Some(None). At least we make sure the prefix has a namespace associated.
-        Some(prefix),
+        namespace.cloned(),
         local_prefixes,
         attributes,
         Vec::new(),
@@ -1052,15 +1037,14 @@ mod tests {
 
         let elem = Element::new(
             "name".to_owned(),
-            "namespace".to_owned(),
-            None,
+            Some("namespace".to_owned()),
             (None, "namespace".to_owned()),
             BTreeMap::from_iter(vec![("name".to_string(), "value".to_string())].into_iter()),
             Vec::new(),
         );
 
         assert_eq!(elem.name(), "name");
-        assert_eq!(elem.ns(), "namespace".to_owned());
+        assert_eq!(elem.ns(), Some("namespace".to_owned()));
         assert_eq!(elem.attr("name"), Some("value"));
         assert_eq!(elem.attr("inexistent"), None);
     }
@@ -1107,7 +1091,7 @@ mod tests {
         let elem = Element::from_reader(&mut reader).unwrap();
 
         assert_eq!(elem.name(), String::from("bar"));
-        assert_eq!(elem.ns(), String::from("ns1"));
+        assert_eq!(elem.ns(), Some(String::from("ns1")));
         // Ensure the prefix is properly added to the store
         assert_eq!(
             elem.prefixes.get(&Some(String::from("foo"))),

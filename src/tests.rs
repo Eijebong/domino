@@ -52,29 +52,6 @@ fn reader_deduplicate_prefixes() {
     let _: Element = r#"<root xmlns="ns1"><child xmlns:p1="ns2"><p1:grandchild/></child></root>"#
         .parse()
         .unwrap();
-
-    match r#"<p1:root xmlns:p1="ns1"><child/></p1:root>"#.parse::<Element>() {
-        Err(Error::MissingNamespace) => (),
-        Err(err) => panic!("No or wrong error: {:?}", err),
-        Ok(elem) => panic!(
-            "Got Element: {}; was expecting Error::MissingNamespace",
-            String::from(&elem)
-        ),
-    }
-}
-
-#[test]
-fn reader_no_deduplicate_sibling_prefixes() {
-    // The reader shouldn't reuse the sibling's prefixes
-    match r#"<root xmlns="ns1"><p1:child1 xmlns:p1="ns2"/><p1:child2/></root>"#.parse::<Element>() {
-        Err(Error::MissingNamespace) => (),
-        Err(err) => panic!("No or wrong error: {:?}", err),
-        Ok(elem) => panic!(
-            "Got Element:\n{:?}\n{}\n; was expecting Error::MissingNamespace",
-            elem,
-            String::from(&elem)
-        ),
-    }
 }
 
 #[test]
@@ -276,7 +253,7 @@ fn builder_works() {
         .append("e")
         .build();
     assert_eq!(elem.name(), "a");
-    assert_eq!(elem.ns(), "b".to_owned());
+    assert_eq!(elem.ns(), Some("b".to_owned()));
     assert_eq!(elem.attr("c"), Some("d"));
     assert_eq!(elem.attr("x"), None);
     assert_eq!(elem.text(), "e");
@@ -374,7 +351,7 @@ fn wrongly_closed_elements_error() {
 fn namespace_simple() {
     let elem: Element = "<message xmlns='jabber:client'/>".parse().unwrap();
     assert_eq!(elem.name(), "message");
-    assert_eq!(elem.ns(), "jabber:client".to_owned());
+    assert_eq!(elem.ns(), Some("jabber:client".to_owned()));
 }
 
 #[test]
@@ -383,7 +360,7 @@ fn namespace_prefixed() {
         .parse()
         .unwrap();
     assert_eq!(elem.name(), "features");
-    assert_eq!(elem.ns(), "http://etherx.jabber.org/streams".to_owned(),);
+    assert_eq!(elem.ns(), Some("http://etherx.jabber.org/streams".to_owned(),));
 }
 
 #[test]
@@ -392,10 +369,10 @@ fn namespace_inherited_simple() {
         .parse()
         .unwrap();
     assert_eq!(elem.name(), "stream");
-    assert_eq!(elem.ns(), "jabber:client".to_owned());
+    assert_eq!(elem.ns(), Some("jabber:client".to_owned()));
     let child = elem.children().next().unwrap();
     assert_eq!(child.name(), "message");
-    assert_eq!(child.ns(), "jabber:client".to_owned());
+    assert_eq!(child.ns(), Some("jabber:client".to_owned()));
 }
 
 #[test]
@@ -403,10 +380,10 @@ fn namespace_inherited_prefixed1() {
     let elem: Element = "<stream:features xmlns:stream='http://etherx.jabber.org/streams' xmlns='jabber:client'><message xmlns='jabber:client' /></stream:features>"
         .parse().unwrap();
     assert_eq!(elem.name(), "features");
-    assert_eq!(elem.ns(), "http://etherx.jabber.org/streams".to_owned(),);
+    assert_eq!(elem.ns(), Some("http://etherx.jabber.org/streams".to_owned(),));
     let child = elem.children().next().unwrap();
     assert_eq!(child.name(), "message");
-    assert_eq!(child.ns(), "jabber:client".to_owned());
+    assert_eq!(child.ns(), Some("jabber:client".to_owned()));
 }
 
 #[test]
@@ -414,10 +391,10 @@ fn namespace_inherited_prefixed2() {
     let elem: Element = "<stream xmlns='http://etherx.jabber.org/streams' xmlns:jabber='jabber:client'><jabber:message xmlns:jabber='jabber:client' /></stream>"
         .parse().unwrap();
     assert_eq!(elem.name(), "stream");
-    assert_eq!(elem.ns(), "http://etherx.jabber.org/streams".to_owned(),);
+    assert_eq!(elem.ns(), Some("http://etherx.jabber.org/streams".to_owned(),));
     let child = elem.children().next().unwrap();
     assert_eq!(child.name(), "message");
-    assert_eq!(child.ns(), "jabber:client".to_owned());
+    assert_eq!(child.ns(), Some("jabber:client".to_owned()));
 }
 
 #[test]
@@ -451,9 +428,8 @@ fn invalid_element_error() {
 }
 
 #[test]
-fn missing_namespace_error() {
-    match "<a/>".parse::<Element>() {
-        Err(crate::error::Error::MissingNamespace) => (),
-        err => panic!("No or wrong error: {:?}", err),
-    }
+fn missing_namespace_ok() {
+    let elem = "<a/>".parse::<Element>();
+    assert!(elem.is_ok());
+
 }
